@@ -1143,12 +1143,76 @@
         .slide-animate>.fade-in:nth-child(5) {
             animation-delay: 0.85s;
         }
+
+        /* ===== SPLASH SCREEN ===== */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: url('fondo.png') center center / cover no-repeat fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: opacity 1s ease, visibility 1s;
+        }
+
+        #splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .splash-content {
+            padding: 30px;
+            max-width: 400px;
+            animation: fadeIn 1.5s ease;
+        }
+
+        .splash-btn {
+            margin-top: 30px;
+            padding: 14px 40px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 2px solid var(--gold);
+            border-radius: 50px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .splash-btn:hover {
+            background: white;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 
 <body>
 
     <div id="app">
+        <!-- SPLASH SCREEN -->
+        <div id="splash-screen">
+            <div class="splash-content">
+                <img src="corona.png" alt="Corona" class="top-crown" style="width: 120px;">
+                <div class="cv-name" style="font-size: 58px;">Rosa Cielo</div>
+                <div class="cv-top" style="margin-top: 10px;">Te invita a su celebración</div>
+                <button class="splash-btn" onclick="startInvitation()">Abrir Invitación</button>
+            </div>
+        </div>
+
         <div class="bg-shimmer"></div>
         <div class="stars" id="stars"></div>
         <div class="petals" id="petals"></div>
@@ -1349,8 +1413,8 @@
         <!-- MUSIC BUTTON -->
         <button id="music-btn" onclick="toggleMusic()">🎵</button>
 
-        <!-- AUDIO EN BUCLE -->
-        <audio id="bg-music" loop preload="none">
+        <!-- AUDIO EN BUCLE (Preload auto para asegurar inicio inmediato) -->
+        <audio id="bg-music" loop preload="auto">
             <source src="audiomorat.mp3" type="audio/mpeg">
         </audio>
     </div>
@@ -1530,6 +1594,24 @@
             app.appendChild(n);
             setTimeout(() => n.remove(), 3200);
             setTimeout(() => { if (musicOn) spawnNotes(); }, 500 + Math.random() * 900);
+        }
+
+        // ======== Initial Interaction (Bypass Autoplay) ========
+        function startInvitation() {
+            const subtitle = document.querySelector('.cv-top');
+            const splash = document.getElementById('splash-screen');
+            splash.classList.add('hidden');
+            
+            // Forzar carga y reproducción directa (gesto de usuario)
+            audio.load();
+            startMusicFade();
+            
+            // Fullscreen trigger
+            const el = document.documentElement;
+            const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+            if (req) {
+                req.call(el).catch(() => {});
+            }
         }
 
         // ======== Slider System ========
